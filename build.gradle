@@ -1,0 +1,51 @@
+plugins {
+    id "java"
+    id 'org.springframework.boot' version '3.1.3'
+    id 'org.openapi.generator' version '6.6.0'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter-web:3.1.3')
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa:3.1.3')
+    implementation('org.springdoc:springdoc-openapi-ui:1.7.0')
+    implementation('org.openapitools:jackson-databind-nullable:0.2.1')
+}
+
+compileJava.dependsOn tasks.named("openApiGenerate")
+
+bootJar {
+    enabled = false
+}
+
+
+jar {
+    enabled = true
+    archiveClassifier = ''
+    archiveBaseName = 'api-swagger'
+}
+
+
+openApiGenerate {
+    validateSpec = true
+    generatorName.set("spring")
+    inputSpec.set("$rootDir/src/main/resources/openapi.yaml")
+    outputDir.set("$buildDir/generated")
+    apiPackage.set("com.thegeekchief.example.api")
+    invokerPackage.set("com.thegeekchief.example.invoker")
+    modelPackage.set("com.thegeekchief.example.model")
+    configOptions.set([
+            dateLibrary: "java8",
+            useJakartaEe: "true",
+            openApiNullable: "true",
+            interfaceOnly: 'true',
+            cleanupOutput: 'true'
+    ])
+}
+
